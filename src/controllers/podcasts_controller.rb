@@ -5,8 +5,6 @@ require 'json'
 require_relative '../services/spotify_navigator'
 require_relative '../services/caches/cache_show_cards'
 
-# require_relative '../services/caches/cache_show_cards'
-
 # PodcastsController
 class PodcastsController < Sinatra::Base
   get '/show/:id' do
