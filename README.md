@@ -12,7 +12,7 @@ bundle install # Install dependencies
 ## Running
 
 ```sh
-ruby src/sever.rb # Start server
+ruby src/server.rb # Start server
 ```
 
 Go to localhost:4567
