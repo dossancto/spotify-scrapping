@@ -2,7 +2,6 @@
 
 require 'selenium-webdriver'
 require_relative '../models/spotify_card_model'
-# require 'models/spotify_card_model'
 
 VIDEOS_LIST_ELEMENT = "document.querySelector('div[data-testid=infinite-scroll-list]')"
 
@@ -11,17 +10,13 @@ class SpotifyNavigator
   attr_reader :url, :options, :driver
 
   def initialize(show_id)
-    @url = get_url(show_id)
+    @url = "https://open.spotify.com/show/#{show_id}"
     @options = Selenium::WebDriver::Chrome::Options.new
     @options.add_argument('--enable-javascript')
     @options.add_argument('headless')
     @driver = Selenium::WebDriver.for(:chrome, options:)
     # @slaves = (1..4).map { Selenium::WebDriver.for(:chrome, options:) }
     @retry_count = 3
-  end
-
-  def get_url(show_id)
-    "https://open.spotify.com/show/#{show_id}"
   end
 
   def exist_list?(_url)

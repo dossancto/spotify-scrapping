@@ -1,4 +1,8 @@
+# frozen_string_literal: true
+
 SPOTIFY_BASE_URL = 'https://open.spotify.com'
+
+## SpotifyCardModel
 class SpotifyCardModel
   attr_reader :title, :description, :duration, :date, :video_id
 
