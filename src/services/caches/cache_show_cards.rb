@@ -4,21 +4,28 @@ require 'json'
 require_relative '../../models/spotify_card_cache_model'
 
 CACHE_DIRECTORY = File.join(Dir.home, '.cache/spotify_scrap')
-CACHE_FILE_LOCATION = File.join(CACHE_DIRECTORY, 'cards.json')
+CACHE_FILE_LOCATION = File.join(CACHE_DIRECTORY, 'cards-{show-id}.json')
 
 MAX_ALIVE = 60 * 60 * 1000 # 1 Hour
 
 ## CacheShowCards
-module CacheShowCards
-  def self.setup_config_file
+class CacheShowCards
+  attr_reader :show_id, :count
+
+  def initialize(show_id)
+    @show_id = show_id
+    @file_location = CACHE_FILE_LOCATION.gsub('{show-id}', show_id)
+  end
+
+  def setup_config_file
     Dir.mkdir(CACHE_DIRECTORY) unless Dir.exist?(CACHE_DIRECTORY)
   end
 
-  def self.read_cache
-    File.read(CACHE_FILE_LOCATION)
+  def read_cache
+    File.read(@file_location)
   end
 
-  def self.read_cards_from_cache(count)
+  def read_cards_from_cache(count)
     return unless enouth_count?(count)
 
     cache = JSON.parse(read_cache)
@@ -27,25 +34,25 @@ module CacheShowCards
     cards[0...count]
   end
 
-  def self.currency_from_cache
+  def currency_from_cache
     JSON.parse(read_cache)
   end
 
-  def self.valid_cache?
-    return false unless File.exist? CACHE_FILE_LOCATION
+  def valid_cache?
+    return false unless File.exist? @file_location
     return false unless Dir.exist? CACHE_DIRECTORY
 
     cache_yet_valid?
   end
 
-  def self.enouth_count?(count)
+  def enouth_count?(count)
     cache = JSON.parse(read_cache)
 
     cached_count = cache['count']
     cached_count >= count
   end
 
-  def self.cache_yet_valid?
+  def cache_yet_valid?
     cache = JSON.parse(read_cache)
 
     given_timestamp = cache['timestamp']
@@ -56,15 +63,22 @@ module CacheShowCards
     time_difference < MAX_ALIVE
   end
 
-  def self.write_cache(cards)
+  def write_cache(cards)
     setup_config_file
 
     cache = SpotifyCardCacheModel.new(cards)
 
-    File.open(CACHE_FILE_LOCATION, 'w') do |file|
+    File.open(@file_location, 'w') do |file|
       content = cache.to_json
       file.puts content
       puts 'Cards saved.'
     end
+  end
+
+  def reset_cache
+    File.delete(@file_location)
+    'Cache reseted'
+  rescue Errno::ENOENT
+    'Error while resetting cache'
   end
 end
