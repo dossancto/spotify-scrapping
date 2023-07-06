@@ -3,14 +3,14 @@
 require 'selenium-webdriver'
 require_relative '../models/spotify_card_model'
 
+SPOTIFY_BASE_URL =  'https://open.spotify.com'
 VIDEOS_LIST_ELEMENT = "document.querySelector('div[data-testid=infinite-scroll-list]')"
 
 ## SpotifyNavigator
 class SpotifyNavigator
   attr_reader :url, :options, :driver
 
-  def initialize(show_id)
-    @url = "https://open.spotify.com/show/#{show_id}"
+  def initialize
     @options = Selenium::WebDriver::Chrome::Options.new
     @options.add_argument('--enable-javascript')
     @options.add_argument('headless')
@@ -28,9 +28,11 @@ class SpotifyNavigator
     true
   end
 
-  def get_last_videos(count = 5)
+  def get_last_videos(show_id, count = 5)
+    url = "#{SPOTIFY_BASE_URL}/show/#{show_id}"
+
     begin
-      @driver.get(@url)
+      @driver.get(url)
       get_cards_infos(count)
     rescue StandardError
       return get_last_videos(count) if try_retry
